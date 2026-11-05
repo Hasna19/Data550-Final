@@ -1,0 +1,71 @@
+---
+title: "CHD"
+author: "Hasna Alghamdi"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r, set-chunk-opts, echo = FALSE}
+library(knitr)
+opts_chunk$set(
+  echo = FALSE, warning = FALSE, message = FALSE
+)
+```
+
+# Introduction: 
+```{r, Read the data, echo=FALSE, message = FALSE}
+library(readr)
+CHD <- read_csv("~/Desktop/RSPH/Fall2026/DATA550/Final/Data/framingham.csv")
+```
+The Coronary heart disease data set has `r nrow(CHD)` rows and `r ncol(CHD)` columns from an ongoing cardiovascular study on residents of the town of Framingham, Massachusetts. Including some demographics, behavioral and medical conditions that might contribute to a future coronary heart disease (CHD)
+
+## Goal of the analysis:
+1. Understand the potential risk factors contributed to coronary heart disease (CHD)
+2. Classification prediction based on the statistically significant independent factors and the dependent outcome 
+
+# Descriptive Analysis
+
+## Tabular analysis
+### Table 1
+```{r, table1, echo=FALSE, message = FALSE}
+library(labelled)
+library(gtsummary)
+
+var_label(CHD) <- list(
+  age = "Age of the patient",
+  BMI = "Body Mass Index",
+  totChol = "Total cholesterol level",
+  glucose = "glucose level",
+ heartRate = "Heart Rate",
+ sysBP = "systolic blood pressure",
+ diaBP = "diastolic blood pressure"
+)
+
+CHD$Gender <- ifelse(CHD$male == 1, "Male", "Female")
+
+CHD |>
+  select("Gender","heartRate", "age", "sysBP", "diaBP", "totChol", "glucose", "BMI") |>
+  tbl_summary(by = Gender, missing = "no") |>
+  modify_spanning_header(c("stat_1", "stat_2") ~ "**Summary of CHD**") |>
+  add_overall() |>
+  add_p()
+```
+Table 1 is a simple summary of the data, containing the following variables:
+Age of the patient, BMI, Total cholesterol level, glucose level, Heart Rate, systolic blood pressure, and diastolic blood pressure. Divided onto two groups by gender.
+There is some similarity of most of the variables between male and female, except the BMI, where it was slightly higher among male. 
+
+## Graphical analysis
+### scatter plot
+```{r, Scatter_plot, echo=FALSE, message = FALSE, warning=FALSE}
+#| fig.align = "center",
+#| out.width = "400px"
+library(ggplot2)
+
+ggplot(CHD, aes(x = heartRate, y = BMI)) +
+  geom_point() +
+  geom_smooth(method = lm) +
+  theme_bw()
+
+```
+The above graph shows a distribution of the heart rate and the BMI, in addition to the regression line close to 25.4 (23.1, 28.0) in BMI. 
+  
